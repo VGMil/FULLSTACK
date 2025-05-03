@@ -39,6 +39,6 @@ CREATE TABLE IF NOT EXISTS files (
 );
 
 -- Insert default admin user (password: admin123)
-INSERT INTO users (username, password, full_name, email, is_admin) 
-VALUES ('admin', '$2y$10$8tGIx5g5s5q5r5XhLs5r5uJx5g5s5q5r5XhLs5r5u', 'System Administrator', 'admin@example.com', TRUE);
+INSERT INTO users ( password, full_name, email, is_admin) 
+VALUES ('$2y$10$8tGIx5g5s5q5r5XhLs5r5uJx5g5s5q5r5XhLs5r5u', 'System Administrator', 'admin@example.com', TRUE);
 

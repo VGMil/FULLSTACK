@@ -6,6 +6,7 @@ import bodyParser from 'body-parser';
 import userRoutes from './routes/userRoutes.js';
 import { setupSocket } from './sockets/authSocket.js';
 import { setupStateSocket } from './sockets/stateSocket.js';
+import logger from 'morgan';
 
 const app = express();
 const httpServer = createServer(app);
@@ -16,7 +17,7 @@ const io = new Server(httpServer, {
   }
 });
 
-
+app.use(logger('dev'));
 app.use(cors());
 app.use(bodyParser.json());
 app.use('/users', userRoutes);

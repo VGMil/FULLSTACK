@@ -1,39 +1,35 @@
-version: '3.8'
-
 services:
-  database:
+  db:
     image: mysql:8.0
     container_name: db
     restart: always
-    env_file:
-      - .env
     environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: super
+      MYSQL_DATABASE: fingerprint_system
+      MYSQL_USER: common
+      MYSQL_PASSWORD: common
+      MYSQL_ROOT_HOST: '%'
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "3306:3306"
     volumes:
-      - ./my-db/data:/var/lib/mysql
-      - ./my-db/setup.sql:/docker-entrypoint-initdb.d/setup.sql
-      - ./my-db/conf:/etc/mysql/conf.d
+      - ./my-db/setup.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_data:/var/lib/mysql
     networks:
       - app-network
-
+#####################################################
+# PHPMYADMIN (MySQL)
+#####################################################
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: always
-    environment:
-      - PMA_PORT=3306
     ports:
-      - "8080:80"
+      - "8000:80"
     depends_on:
-      - database
+      - db
     networks:
       - app-network
 
+volumes:
+  db_data: {}
 networks:
   app-network:
     driver: bridge
