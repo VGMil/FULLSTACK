@@ -11,4 +11,20 @@ const dbConfig = {
   queueLimit: 0
 };
 
-export const pool = mysql.createPool(dbConfig);
+let pool;
+
+
+try {
+  pool = mysql.createPool(dbConfig);
+  // Test the connection by getting a connection
+  const connection = await pool.getConnection();
+  console.log('Successfully connected to the database.');
+  connection.release(); // Release the connection back to the pool
+} catch (error) {
+  console.error('!!! Failed to connect to the database !!!');
+  console.error('Error details:', error);
+  // Exit the process if the database connection fails, as it's critical
+  process.exit(1);
+}
+
+export { pool };

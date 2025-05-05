@@ -1,21 +1,16 @@
 import express from 'express';
 import { createServer } from 'http';
-import { Server } from 'socket.io';
+import { WebSocketServer } from 'ws'; // Importar WebSocketServer
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import userRoutes from './routes/userRoutes.js';
-import { setupSocket } from './sockets/authSocket.js';
-import { setupStateSocket } from './sockets/stateSocket.js';
+
+import setupStateSocket from './sockets/FingerPrint/wsFingerPrint.js';
 import logger from 'morgan';
 
 const app = express();
 const httpServer = createServer(app);
-const io = new Server(httpServer, {
-  cors: {
-    origin: "*",
-    methods: ['GET', 'POST']
-  }
-});
+// Crear instancia de WebSocketServer en lugar de Socket.IO Server
 
 app.use(logger('dev'));
 app.use(cors({
@@ -25,9 +20,14 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use('/users', userRoutes);
 
-// WebSockets
-setupSocket(io);
-setupStateSocket(io);
+
+
+const wss = new WebSocketServer({ server: httpServer }); 
+wss.on('connection', (ws, req) => {
+  console.log('Cliente conectado por WebSocket');
+  setupStateSocket(wss,ws, req);
+});
+
 
 const PORT = 3001;
 httpServer.listen(PORT, () => {

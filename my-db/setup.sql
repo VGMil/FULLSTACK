@@ -16,12 +16,11 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS fingerprints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    fingerprint_id INT NOT NULL,
     fingerprint_data TEXT NOT NULL,
     finger_name VARCHAR(50) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    UNIQUE KEY (user_id, fingerprint_id)
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,  -- Relación con la tabla de usuarios
+    UNIQUE KEY (user_id, finger_name)   
 );
 
 -- Files table
