@@ -5,7 +5,7 @@ import { pool } from "../../../config/db.js";  // Pool de conexión a la base de
  * @param {number} userId - ID del usuario que está registrando la huella
  * @returns {Promise<Object>} - Mensaje con el resultado de la operación
  */
-async function registerFingerprint(fingerprint, finger_name, userId) {
+async function registerFingerprint(fingerprint, userId) {
   // Verifica si la huella digital ya existe
   const [existing] = await pool.query(
     "SELECT * FROM fingerprints WHERE fingerprint_data = ?",
@@ -23,7 +23,7 @@ async function registerFingerprint(fingerprint, finger_name, userId) {
     ON DUPLICATE KEY UPDATE 
       fingerprint_data = VALUES(fingerprint_data),
       finger_name = VALUES(finger_name)`,
-   [userId, fingerprint, finger_name]
+   [userId, fingerprint, ""]
   
  );
 

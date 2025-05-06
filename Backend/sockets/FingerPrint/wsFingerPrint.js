@@ -9,14 +9,16 @@
 //| `scan_confirm`    | `info   ` | ESP32    | frontend | Confirmación de segunda pasada de huella.                                 |
 //| `scan_confirm`    | `success` | ESP32    | frontend | Confirmación de segunda pasada de huella aceptada.                        |
 //| `scan_confirm`    | `error  ` | ESP32    | frontend | Problemas con la de segunda pasada de huella.                             |
-//| `scan_successful` | `success` | ESP32    | server   | Huella escaneada con éxito, envio de datos.                               |                |
-//| `scan_successful` | `error`   | server   | frontend | Escaneo realizado, pero huella inválida (no coincide, corrupta, etc.).    |
-
+//| `scan_done      ` | `success` | ESP32    | Server   | Huella escaneada con éxito, envio de datos.                               |                |
+//| `scan_done      ` | `error`   | ESP32    | Server   | Escaneo realizado, pero huella inválida (no coincide, corrupta, etc.).    |
+//| `miss_conection`  | `error`   | Server   | frontend | El ESP32 no responde a la solicitud de escaneo.                           |
 import  handleReset from "./Reqs/HandleReset.js";
 import  handleScanRequest from "./Reqs/HandleScanRequest.js";
 // import  handleScanData from "./Reqs/HandleScanData.js";	
 import  handleReadyScan from "./Reqs/HandleReadyScan.js";	
 import { sendEvent } from "./utils/sendEvent.js";
+import HandleScanConfirm from "./Reqs/HandleScanConfirm.js";
+import handleScanDone from "./Reqs/HandleScanDone.js";
 
 let currentState = {
     "event": "none",// Tipo de evento, ej: "scan_request", "scan_data"
@@ -42,11 +44,17 @@ let currentState = {
     },
     
     scan_request: (wss, status, context, payload, origin) => {
-        handleScanRequest(wss, status, context, payload, origin, currentState, esp32Connected);
+        handleScanRequest(wss, status, context, payload, origin, currentState);
     },
-    // scan_data: (wss, status, context, payload, origin) =>{
-    //     handleScanData(wss, status, context, payload, origin, currentState, esp32Connected)
-    // },
+
+    scan_confirm:(wss, status, context, payload, origin) =>{
+        HandleScanConfirm(wss, status, context, payload, origin, currentState)
+    },
+
+    scan_done: (wss, status, context, payload, origin) => {
+        handleScanDone(wss, status, context, payload, origin, currentState);
+    },
+
     reset: (wss) => {
         handleReset(wss, currentState);
     }
@@ -54,8 +62,6 @@ let currentState = {
   
   
   const setupStateSocket = (wss, ws, req) => {
-    // handleReset(wss, currentState); // Estado inicial al conectar
-  
     ws.on("message", (messageStr) => {
       let message;
       try {
@@ -72,14 +78,12 @@ let currentState = {
         console.log("📨 Evento recibido:", event ," - ", origin, " - ", status);
 
         if(event !=="ready_scan" && !esp32Connected){
-          sendEvent(wss, event, "error", context, {message: "ESP32 not connected"}, "server");
+          sendEvent(wss, "miss_conection", "error", "none", {message: "ESP32 not connected"}, "server");
           return;
         }
           handler(wss,  status, context, { ...payload }, origin);
       } else {
-
         console.warn("⚠️ Evento desconocido:", event);
-
       }
     });
   };

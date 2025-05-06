@@ -33,9 +33,7 @@ async function handleScanData(wss, status, context, payload, origin, currentStat
       sendEvent(wss, "scan_result", "auth", payload); 
     }
 
-    sendEvent(wss, "scan_result", "auth", {
-      status: "success",
-      message: "User authenticated",
+    sendEvent(wss, "scan_result", "auth", {status: "success",message: "User authenticated",
       user: {
         id: user.id,
         username: user.username,
