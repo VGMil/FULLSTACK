@@ -57,6 +57,8 @@ let currentState = {
 
     reset: (wss) => {
         handleReset(wss, currentState);
+        esp32Connected = false;
+        console.log("ESP32 disconnected");
     }
   };
   
