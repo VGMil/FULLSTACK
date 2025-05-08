@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import Card from '../components/Card';
 import CustomButton from '../components/CustomButton';
 
-export default function Register() {
+export default function Register({...scanState}) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

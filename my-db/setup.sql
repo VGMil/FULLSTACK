@@ -16,13 +16,12 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS fingerprints (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
-    fingerprint_raw TEXT NOT NULL COMMENT 'Datos de la huella en hexadecimal (ej: 512 bytes desde Arduino)',
-    fingerprint_hash VARCHAR(64) NOT NULL COMMENT 'Hash de características clave (SHA-256 parcial)',
+    fingerprint_raw MEDIUMTEXT NOT NULL COMMENT 'Datos de la huella en hexadecimal (ej: 512 bytes desde Arduino, usados para extracción de minutiae)',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    INDEX idx_fingerprint_hash (fingerprint_hash) COMMENT 'Para búsquedas rápidas',
     INDEX idx_user_id (user_id) COMMENT 'Búsquedas por usuario'
-) ENGINE=InnoDB COMMENT='Almacena huellas dactilares con soporte para búsqueda aproximada';
+) ENGINE=InnoDB COMMENT='Almacena huellas dactilares para comparación basada en minutiae';
+
 -- Files table
 CREATE TABLE IF NOT EXISTS files (
     id INT AUTO_INCREMENT PRIMARY KEY,

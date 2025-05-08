@@ -4,21 +4,21 @@ import CustomButton from '../components/CustomButton';
 import Card from '../components/Card';
 import { Fingerprint } from 'lucide-react';
 import Header from '../components/Header';
-import { useScanState } from '../hooks/useScanState';
 
 
 
-export default function Login() {
+
+export default function Login({...scanState}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
   const navigate = useNavigate();
-  const {startScan} = useScanState();
+  
 
   
   
   const goToScan = () => {
-    startScan();
+    console.log('esp32Connected', scanState.esp32Connected);
     navigate('/finger-print');
   }
 
@@ -133,7 +133,7 @@ export default function Login() {
           footer={
             <div className='flex flex-col'>
 
-              <CustomButton variant='secondary' onClick={goToScan}>
+              <CustomButton variant='secondary' onClick={goToScan} disabled={!scanState.esp32Connected}>
                 <div className="flex justify-center items-center w-full">
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 24 24">
                     <path d="M15.545 6.558c.21.005.338.018.51.051.383.086.66.324.78.646.117.32.042.641-.154.916-.198.28-.493.434-.83.434H14.3c-.383 0-.76-.08-1.11-.23a2.83 2.83 0 0 1-.96-.68c-.234-.28-.407-.59-.519-.932-.112-.342-.173-.705-.173-1.087 0-.367.06-.72.173-1.057.112-.336.285-.645.52-.925.232-.28.54-.506.927-.682.386-.176.807-.266 1.26-.27h.046h.066c.354.004.706.073 1.054.207.343.133.655.33.93.59l-1.058.755c-.135-.131-.297-.235-.485-.31a1.7 1.7 0 0 0-.618-.117H14.3c-.246 0-.478.047-.695.14a1.59 1.59 0 0 0-.554.4c-.154.17-.275.37-.357.596-.082.226-.123.476-.123.748 0 .256.041.493.123.718.082.226.203.425.357.595.154.17.34.307.554.415.217.095.45.145.695.145h.066-.003zm-3.065 1.196h.073c.32-.004.615.1.853.304.244.207.368.478.368.812 0 .337-.117.607-.35.815-.23.206-.52.31-.852.31H9.52l-1.467 1.59v-1.59H5.31c-.332 0-.619-.1-.858-.305-.236-.203-.355-.476-.355-.813 0-.338.12-.607.358-.813.239-.203.528-.303.863-.303h1.82V5.383h7.342z" fill="currentColor" />

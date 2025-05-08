@@ -10,6 +10,10 @@ function handleReadyScan(wss, status, context, payload, origin, currentState) {
     
     if (origin === "ESP32" && status === "info") {
         status = "success";
+        payload = {
+            message: "ESP32 ready to scan",
+            esp32Connected: true
+        };
     }else {
         status = "error";
         payload = {message: "ESP32 not connected"};

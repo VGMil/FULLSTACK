@@ -16,7 +16,7 @@ const sendEvent = (wss, event, status ,context, payload = {}, origin = "server")
       origin,
       timestamp: new Date().toISOString()
     };
-  
+    console.log("📨 Mensaje enviado desde el Servidor:", message);
     // Itera sobre todos los clientes conectados
     wss.clients.forEach((client) => {
       // Envía el mensaje solo a los clientes que están listos para recibir

@@ -1,16 +1,15 @@
-import { useEffect } from "react";
-import { useScanState } from "../hooks/useScanState";
+function Files({...scanState}) {
 
-function Files() {
 
-  const {stopScan} = useScanState();
-  useEffect(() => {
-      return () => {
-        stopScan();
-      }
-    }, [])
   return (
-    <div>Files</div>
+    <div>
+      {Object.entries(scanState.user).map(([key, value]) => (
+        <div key={key}>
+          <span>{key}: </span>
+          <span>{String(value)}</span>
+        </div>
+      ))}
+    </div>
   )
 }
 

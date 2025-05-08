@@ -28,6 +28,13 @@ wss.on('connection', (ws, req) => {
   setupStateSocket(wss,ws, req);
 });
 
+wss.on('close', () => {
+  console.log('Cliente desconectado');
+});
+
+wss.on('error', (error) => {
+  console.log('Error en la conexión:', error);
+});
 
 const PORT = 3001;
 httpServer.listen(PORT, () => {

@@ -1,56 +1,93 @@
-//| `scan_done` | `success` | ESP32    | Server   | Huella escaneada con éxito, envio de datos.                               |                |
-//| `scan_done` | `error`   | ESP32    | Server   | Escaneo realizado, pero huella inválida (no coincide, corrupta, etc.).    |
 import { sendEvent } from '../utils/sendEvent.js';
 import { authenticateUser } from '../utils/authContext.js';
-import { registerFingerprint } from '../utils//registerContext.js';
+import { registerFingerprint } from '../utils/registerContext.js';
 
+// Códigos de error centralizados
+const ERROR_CODES = {
+    INVALID_ORIGIN: 'invalid_origin',
+    INVALID_FINGERPRINT: 'invalid_fingerprint',
+    USER_NOT_FOUND: 'user_not_found',
+    REGISTRATION_ERROR: 'registration_error'
+};
 
 async function handleScanDone(wss, status, context, payload, origin, currentState) {
-    if(origin !== "ESP32" ){
-        sendEvent(wss, "scan_done", status = "error", context ="none", payload = {
-            message: "No permissions"
-        }, origin = "server" );    
+    // Validación de origen
+    if (origin !== "ESP32") {
+        await sendEvent(wss, "scan_done", "error", "none", {
+            code: ERROR_CODES.INVALID_ORIGIN,
+            message: "Unauthorized origin"
+        }, "server");
+        return currentState;
     }
+
+    // Validación de estado fallido
     if (status !== "success") {
-        sendEvent(wss, "scan_done", status = "error", context = "none", payload = {
-            message: "Escaneo realizado, pero huella inválida (no coincide, corrupta, etc.)."
-        }, origin = "server");
-        return;
-    }
-    if (!payload.fingerprint_data) {
-        sendEvent(wss, "scan_done", status="error", context = "none", payload ={
-            message: "Fingerprint no existe"
-          }, origin = "server");
-        return;
+        await sendEvent(wss, "scan_done", "error", context, {
+            code: ERROR_CODES.INVALID_FINGERPRINT,
+            message: "Escaneo realizado, pero huella inválida"
+        }, "server");
+        return currentState;
     }
 
-    if(context === "auth"){
-        const user = await authenticateUser(payload.fingerprint_data);
-        if(!user){
-            sendEvent(wss, "scan_done", status="error", context="none", payload = {
-                message: "Usuario no encontrado"
-            }, origin = "server"); 
-            return;
+    // Validación de payload
+    if (!payload?.fingerprint_data) {
+        await sendEvent(wss, "scan_done", "error", context, {
+            code: ERROR_CODES.INVALID_FINGERPRINT,
+            message: "Datos de huella no proporcionados"
+        }, "server");
+        return currentState;
+    }
+
+    try {
+        // Procesamiento según contexto
+        switch (context) {
+            case "auth":
+                const user = await authenticateUser(payload.fingerprint_data);
+                if (!user) {
+                    await sendEvent(wss, "scan_done", "error", context, {
+                        code: ERROR_CODES.USER_NOT_FOUND,
+                        message: "Usuario no encontrado"
+                    }, "server");
+                    return currentState;
+                }
+
+                await sendEvent(wss, "scan_done", "success", context, {
+                    message: "Autenticación exitosa",
+                    user: {
+                        id: user.id,
+                        username: user.username,
+                        email: user.email
+                        // No incluir datos sensibles
+                    }
+                }, "server");
+                break;
+
+            case "register":
+                const result = await registerFingerprint(payload.fingerprint_data, payload.user_id);
+                await sendEvent(wss, "scan_done", result.status, context, {
+                    ...payload,
+                    message: result.message,
+                    code: result.code || undefined
+                }, "server");
+                break;
+
+            default:
+                await sendEvent(wss, "scan_done", "error", "none", {
+                    code: "invalid_context",
+                    message: "Contexto no válido"
+                }, "server");
         }
-        sendEvent(wss, "scan_done", status = "success",context ="auth", payload = {
-            message: "User authenticated",
-            user: {
-                id: user.id,
-                username: user.username,
-                email: user.email
-            }
-            }, origin = "server" 
-        );
-    }
-    if(context === "register"){
-        const result = await registerFingerprint( payload.fingerprint_data, payload.user_id);
-        sendEvent(wss, "scan_done",status = result.status ,context ="register", payload = { ...payload,
-            message: result.message,
-        }, origin = "server" );    
-    }
 
-    return currentState
+        return currentState;
 
+    } catch (error) {
+        console.error(`Error processing scan_done: ${error.message}`);
+        await sendEvent(wss, "scan_done", "error", context, {
+            code: "processing_error",
+            message: "Error al procesar huella digital"
+        }, "server");
+        return currentState;
+    }
 }
 
-export default handleScanDone;  
+export default handleScanDone;
