@@ -8,6 +8,7 @@ import Files from './Pages/Files'
 import { WebSocketProvider } from './contexts/messageContext'
 import Profile from './Pages/Profile'
 import { UserProvider } from './contexts/userContext'
+import { ToastProvider } from './contexts/toastContext'
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
     <>
       <UserProvider>
       <WebSocketProvider>
+      <ToastProvider>
         <Routes>
         <Route 
           path='/'element={<Home/>}
@@ -37,6 +39,7 @@ function App() {
           path='/profile'element={<Profile/>}
         />
       </Routes>
+      </ToastProvider>
       </WebSocketProvider>
       </UserProvider>
     </>

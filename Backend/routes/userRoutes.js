@@ -27,7 +27,7 @@ router.post('/register', async (req, res) => {
 
     // Insert new user
     const [result] = await pool.query(
-      'INSERT INTO users (username, email, password) VALUES (?, ?, ?)',
+      'INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)',
       [username, email, password]
     );
 
@@ -60,7 +60,7 @@ router.post('/login', async (req, res) => {
       message: 'Login successful',
       user: {
         id: user.id,
-        username: user.username,
+        username: user.full_name,
         email: user.email
       }
     });

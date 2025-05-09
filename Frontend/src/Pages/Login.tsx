@@ -6,6 +6,7 @@ import Card from '../components/Card'
 import { Fingerprint } from 'lucide-react'
 import { useWebSocketContext } from '../contexts/messageContext'
 import { Message } from '../Models/message.model'
+import { useUserContext } from '../contexts/userContext'
 
 function Login() {
 
@@ -15,8 +16,8 @@ function Login() {
   const navigate = useNavigate();
 
   const {messageState, sendWebSocketMessage} =useWebSocketContext();
-  console.log('Mensaje ',messageState);
 
+  const {setUserId, setUserEmail, setUserName} = useUserContext();
   const goToScan = () => {
     
     sendWebSocketMessage({
@@ -63,7 +64,15 @@ function Login() {
       });
 
       if (response.ok) {
+        
+        const data = await response.json();
+        if(data.user.id){
+          setUserId(data.user.id);
+          setUserEmail(data.user.email);
+          setUserName(data.user.username);
+        }
         navigate('/files');
+
       }
     } catch (error) {
       console.error('Login error:', error);

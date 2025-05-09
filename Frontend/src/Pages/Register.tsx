@@ -1,4 +1,3 @@
-
 import Header from '../components/Header'
 import { Link, useNavigate } from 'react-router-dom'
 import CustomButton from '../components/CustomButton'
@@ -7,13 +6,12 @@ import { Fingerprint } from 'lucide-react'
 import { useState } from 'react'
 
 function Register() {
-
-  const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({
-    name: '',
+    username: '',
     email: '',
     password: '',
     confirmPassword: ''
@@ -23,14 +21,14 @@ function Register() {
   const validateForm = () => {
     let valid = true;
     const newErrors = {
-      name: '',
+      username: '',
       email: '',
       password: '',
       confirmPassword: ''
     };
 
-    if (!name) {
-      newErrors.name = 'Nombre requerido';
+    if (!username) {
+      newErrors.username = 'Nombre requerido';
       valid = false;
     }
 
@@ -64,23 +62,33 @@ function Register() {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch('http://localhost:3001/users', {
+      const response = await fetch('http://localhost:3001/users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ username, email, password })
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         navigate('/Login');
+      } else {
+        setErrors(prev => ({
+          ...prev,
+          email: data.message || 'Error en el registro'
+        }));
       }
     } catch (error) {
       console.error('Registration error:', error);
+      setErrors(prev => ({
+        ...prev,
+        email: 'Error en el servidor'
+      }));
     }
   };
 
   return (
     <div className="flex justify-center items-center">
-
       <Header>
         <Link to="/register">
           <CustomButton variant="primary" disabled>
@@ -111,19 +119,19 @@ function Register() {
             <>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="username" className="block text-sm font-medium text-gray-700">
                     Nombre
                   </label>
                   <input
                     type="text"
-                    id="name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    id="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     placeholder="Milo Velasquez"
                   />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                  {errors.username && (
+                    <p className="mt-1 text-sm text-red-600">{errors.username}</p>
                   )}
                 </div>
                 <div>
@@ -180,7 +188,6 @@ function Register() {
                   Registrarse
                 </CustomButton>
               </form>
-
             </>
           }
           footer={
@@ -195,7 +202,6 @@ function Register() {
         </Card>
       </div>
     </div>
-
   )
 }
 
