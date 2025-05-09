@@ -27,14 +27,28 @@ function FingerPrint() {
       if (status === 'success') {
 
         if (context === 'auth') {
-          setUserId(payload.user.id);
-          navigate('/files');
+          if(!user_id){
+            setUserId(payload.user.id);
+          }
+          console.log("usuario", user_id)
+          setTimeout(() => {
+            navigate('/files');
+          }, 200);
+
         } else if (context === 'register') {
-          setUserId(payload.user_id);
-          navigate('/profile');
+          if(!user_id){
+            setUserId(payload.user_id);
+          }
+          console.log("usuario", user_id)
+
+          setTimeout(() => {
+            navigate('/profile');
+          }, 200);
         }
       } else {
-        navigate(-1);
+        setTimeout(() => {
+          navigate(-1);
+        }, 200);
       }
     }
   }, [messageState, navigate, setUserId]);

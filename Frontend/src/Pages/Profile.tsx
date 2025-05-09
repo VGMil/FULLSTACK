@@ -67,9 +67,9 @@ function Profile() {
     return (
         <div className="flex justify-center items-center h-full w-full">
             <Header>
-                    <CustomButton variant='clear' className='flex gap-1'>
-                    <ArrowLeft className='text-primary'></ArrowLeft>
-                    <p className='text-primary'>Volver</p>
+                    <CustomButton variant='clear' className='flex gap-1' onClick={()=>navigate('/files')}>
+                        <ArrowLeft className='text-primary'></ArrowLeft>
+                        <p className='text-primary'>Volver</p>
                     </CustomButton>
             </Header>
 
