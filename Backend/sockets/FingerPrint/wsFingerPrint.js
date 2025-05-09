@@ -19,6 +19,7 @@ import  handleReadyScan from "./Reqs/HandleReadyScan.js";
 import { sendEvent } from "./utils/sendEvent.js";
 import HandleScanConfirm from "./Reqs/HandleScanConfirm.js";
 import handleScanDone from "./Reqs/HandleScanDone.js";
+import { handleConnection } from "./Reqs/HandleConnection.js";
 
 let currentState = {
     "event": "none",// Tipo de evento, ej: "scan_request", "scan_data"
@@ -32,6 +33,9 @@ let currentState = {
   let esp32Connected = false;
 
   const eventHandlers = {
+    connection: (wss, status, context, payload, origin) => {
+      currentState = handleConnection(wss, status, context, payload, origin);
+    },
     ready_scan: (wss, status, context, payload, origin) => {
         currentState = handleReadyScan(wss, status, context, payload, origin, currentState) // Maneja el evento ready_sca
         if(currentState.status === "success"){
@@ -68,6 +72,7 @@ let currentState = {
       let message;
       try {
         message = JSON.parse(messageStr);
+        console.log(message)
       } catch (err) {
         console.warn("⚠️ Mensaje JSON inválido:", messageStr);
         return;
@@ -77,7 +82,6 @@ let currentState = {
   
       if (handler) {
 
-        console.log("📨 Evento recibido:", event ," - ", origin, " - ", status);
 
         if(event !=="ready_scan" && !esp32Connected){
           sendEvent(wss, "miss_conection", "error", "none", {message: "ESP32 not connected"}, "server");

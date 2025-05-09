@@ -1,28 +1,34 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import CustomButton from '../components/CustomButton';
-import Card from '../components/Card';
-import { Fingerprint } from 'lucide-react';
-import Header from '../components/Header';
-import { useScanState } from '../hooks/useScanState';
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import CustomButton from '../components/CustomButton'
+import Header from '../components/Header'
+import Card from '../components/Card'
+import { Fingerprint } from 'lucide-react'
+import { useWebSocketContext } from '../contexts/messageContext'
+import { Message } from '../Models/message.model'
 
+function Login() {
 
-
-export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({ email: '', password: '' });
   const navigate = useNavigate();
-  const {startScan} = useScanState();
 
-  
-  
+  const {messageState, sendWebSocketMessage} =useWebSocketContext();
+  console.log('Mensaje ',messageState);
+
   const goToScan = () => {
-    startScan();
+    
+    sendWebSocketMessage({
+      event:'scan_request',
+      context:'auth',
+      origin:'frontend',
+      status:'info',
+      payload:{}
+    }as Message);
+
     navigate('/finger-print');
   }
-
-
 
   const validateForm = () => {
     let valid = true;
@@ -66,8 +72,21 @@ export default function Login() {
 
   return (
     <div className="flex justify-center items-center">
-      <Header variant='Login'></Header>
-      <div className="flex flex-grow items-center justify-center py-20 px-4">
+      <Header>
+        <Link to="/register">
+            <CustomButton variant="primary">
+              Comienza Ya
+            </CustomButton>
+          </Link>
+
+          <Link to="/login">
+            <CustomButton variant="secondary" disabled>
+              Iniciar Sesión
+            </CustomButton>
+          </Link>
+        </Header>
+
+        <div className="flex flex-grow items-center justify-center py-20 px-4">
         <Card 
           header={
             <>
@@ -154,5 +173,9 @@ export default function Login() {
         </Card>
       </div>
     </div>
-  );
+
+    
+  )
 }
+
+export default Login

@@ -70,5 +70,20 @@ router.post('/login', async (req, res) => {
 });
 
 
+router.get('/:id', async (req, res) => {
+  try {
+    
+    const { id } = req.params;
+    const [user] = await pool.query('SELECT * FROM users WHERE id = ?',
+      [id]
+    );
+    res.json({
+      message: 'Get User Succesfull',
+      user:user[0]
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 export default router;

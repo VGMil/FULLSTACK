@@ -4,6 +4,7 @@ import { WebSocketServer } from 'ws'; // Importar WebSocketServer
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import userRoutes from './routes/userRoutes.js';
+import fingerRoutes from './routes/fingerRoutes.js';
 
 import setupStateSocket from './sockets/FingerPrint/wsFingerPrint.js';
 import logger from 'morgan';
@@ -19,6 +20,7 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use('/users', userRoutes);
+app.use('/fingers', fingerRoutes);
 
 
 

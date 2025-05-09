@@ -4,8 +4,9 @@ import { Fingerprint } from "lucide-react";
 
 interface HeaderProps {
  variant?: 'Login' | 'Register'| 'Default'; 
+ children: React.ReactNode
 }
-const Header = ({variant = "Default"}: HeaderProps) => {
+const Header = ({variant = "Default", children}: HeaderProps) => {
   return (
     <header className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-sm border-b border-gray-200 z-50">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -21,17 +22,7 @@ const Header = ({variant = "Default"}: HeaderProps) => {
         </Link>
 
         <div className="flex gap-3">
-          <Link to="/register">
-            <CustomButton variant="primary" disabled = {variant=='Register'} >
-              Comienza Ya
-            </CustomButton>
-          </Link>
-
-          <Link to="/login">
-            <CustomButton variant="secondary" disabled = {variant=='Login'}>
-              Iniciar Sesión
-            </CustomButton>
-          </Link>
+          {children}
         </div>
       </div>
     </header>
